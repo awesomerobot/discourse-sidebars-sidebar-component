@@ -1,4 +1,11 @@
-example_setting:
-  default: true
-  description:
-    en: A description of a setting.
+docs_mode_category:
+  default: ""
+  type: list
+  list_type: category
+
+style_mode:
+  default: "left"
+  type: enum
+  choices:
+    - "top"
+    - "left"
