@@ -1,4 +1,23 @@
+:root {
+  --sidebars-sidebar-button-width: 3.25em;
+  --d-sidebar-row-horizontal-padding: 1rem;
+}
+
+.header-sidebar-toggle button {
+  // match sidebar button size
+  box-sizing: border-box;
+  width: var(--sidebars-sidebar-button-width);
+  height: 3em;
+}
+
+.desktop-view {
+  .chat-header-icon {
+    display: none;
+  }
+}
+
 .experimental-sidebars-sidebar {
+  --d-max-width: 1210px;
   [data-link-name="admin"] {
     display: none;
   }
@@ -14,10 +33,6 @@
   .docs-sidebar-header__row,
   .sidebar-admin-header__row {
     width: auto;
-    margin-right: 0;
-    @if $style-mode == "left" {
-      margin-left: 0;
-    }
     &:first-child {
       display: none;
     }
@@ -41,25 +56,44 @@
       align-content: start;
       padding-top: 1.35em;
       padding-left: 0.75em;
-      padding-right: 0.95em;
+      padding-right: 0.75em;
+      border-right: 1px solid var(--primary-low);
     }
 
-    button {
+    .btn {
       box-sizing: border-box;
-      padding: 0.5em 0.62em;
+      padding: 0.6em 0.33em 0.4em;
       gap: 0;
-      @if $style-mode == "left" {
-        padding: 0.5em 0.785em;
+      flex-direction: column;
+      width: var(--sidebars-sidebar-button-width);
+      min-width: 0;
+      overflow: hidden;
+      .discourse-no-touch & {
+        &:not(.active):hover {
+          background: var(--d-hover);
+        }
+      }
+      .d-button-label {
+        color: var(--d-sidebar-link-color);
+        font-size: var(--font-down-2);
+        letter-spacing: 0.25px;
+        margin-top: 0.5em;
+        width: 100%;
+        @include ellipsis;
       }
 
       .d-icon {
+        color: var(--primary-500);
         margin: 0;
       }
       &.active {
-        background: var(--tertiary);
-        color: var(--secondary);
+        background: var(--d-hover);
+        color: var(--d-sidebar-highlight-color);
+        .d-button-label {
+          color: var(--d-sidebar-highlight-color);
+        }
         .d-icon {
-          color: var(--secondary);
+          color: var(--d-sidebar-highlight-color);
         }
       }
     }
@@ -71,8 +105,9 @@
     .sidebar-container {
       // layout a little hacky, should normalize
       display: grid;
-      grid-template-areas: "sidebars sidebar-content" "sidebars sidebar-content";
+      grid-template-areas: "sidebars sidebar-header" "sidebars sidebar-content";
       grid-template-columns: auto 1fr;
+      grid-template-rows: auto 1fr;
 
       &:has(.docs-sidebar-header) {
         grid-template-areas: "sidebars sidebar-header" "sidebars sidebar-content";
@@ -90,10 +125,6 @@
 
     .sidebar-footer-wrapper {
       display: none;
-    }
-
-    .sidebar-row {
-      padding-left: 0.25em;
     }
 
     .discourse_sidebar_docs-panel {
@@ -121,6 +152,80 @@
   @if $style-mode == "top" {
     .sidebar-wrapper .sidebar-sections {
       padding-top: 0.5em;
+    }
+  }
+}
+
+// user nav
+
+#sidebar-section-content-user-summary,
+#sidebar-section-content-user-invites,
+#sidebar-section-content-badges {
+  padding-bottom: 0;
+}
+
+.experimental-sidebars-sidebar {
+  .discourse-sidebar-user-panel {
+    padding-top: 0;
+  }
+  .bottom-tabs.tabs-list {
+    display: none;
+  }
+  .user-navigation {
+    display: none;
+  }
+  .user-main .about {
+    display: none;
+  }
+  .user-content {
+    margin-top: 0;
+  }
+  .user-sidebar-header {
+    margin-top: 0.75em;
+    padding: var(--d-sidebar-row-horizontal-padding);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 1em;
+    .avatar {
+      width: 2.5em;
+      height: 2.5em;
+      margin-top: 0.25em;
+      flex: 0 0 auto;
+    }
+    &__user {
+      display: flex;
+      gap: 0.5em;
+      align-items: center;
+      overflow: hidden;
+      min-width: 0;
+    }
+    &__user-name {
+      flex: 0 1 auto;
+      min-width: 0;
+      line-height: 1.2;
+      display: flex;
+      flex-direction: column;
+    }
+    .user-name-first {
+      font-size: var(--font-up-2);
+      @include ellipsis;
+    }
+    .user-name-second {
+      color: var(--primary-high);
+      @include ellipsis;
+    }
+    &__actions {
+      display: flex;
+      gap: 0.5em;
+      justify-content: space-between;
+      font-size: var(--font-down-1);
+      .btn {
+        flex: 1 1 auto;
+        &:not(:hover) {
+          background: var(--d-hover);
+        }
+      }
     }
   }
 }

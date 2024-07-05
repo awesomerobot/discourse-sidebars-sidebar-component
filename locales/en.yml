@@ -1,3 +1,9 @@
 en:
   theme_metadata:
-    description: ''
+    description: ""
+  sidebar_buttons:
+    topics: "Topics"
+    chat: "Chat"
+    user: "Profile"
+    docs: "Docs"
+    admin: "Admin"

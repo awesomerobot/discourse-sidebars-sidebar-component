@@ -9,8 +9,10 @@ import { service } from "@ember/service";
 import { eq } from "truth-helpers";
 import DButton from "discourse/components/d-button";
 import bodyClass from "discourse/helpers/body-class";
-import DiscourseURL from "discourse/lib/url";
+import { SEPARATED_MODE } from "discourse/lib/sidebar/panels";
+import DiscourseURL, { userPath } from "discourse/lib/url";
 import Category from "discourse/models/category";
+import i18n from "discourse-common/helpers/i18n";
 
 export default class SidebarsSidebar extends Component {
   @service router;
@@ -35,23 +37,6 @@ export default class SidebarsSidebar extends Component {
   }
 
   @action
-  forceSeparateMode() {
-    if (!this.shouldShow) {
-      return;
-    }
-
-    // this component only works in separate mode, so force it
-    this.currentUser.findDetails().then((user) => {
-      if (user.user_option.chat_separate_sidebar_mode === "always") {
-        return;
-      } else {
-        user.user_option.chat_separate_sidebar_mode = "always";
-        user.save();
-      }
-    });
-  }
-
-  @action
   async setActive() {
     this.docsModeCategory = await Category.asyncFindById(
       this.docsModeCategoryID
@@ -66,10 +51,13 @@ export default class SidebarsSidebar extends Component {
       ? await Category.asyncFindById(topic?.category_id)
       : null;
 
+    this.sidebarState.mode = SEPARATED_MODE;
+
     if (currentRoute.includes("admin")) {
       this.activeState = "admin";
     } else if (currentRoute.includes("chat")) {
       this.activeState = "chat";
+      this.sidebarState.setPanel("chat");
     } else if (
       this.currentURL.includes(this.docsModeCategory.url) ||
       this.currentURL.includes(`/c/${this.docsModeCategoryID}`) ||
@@ -77,8 +65,14 @@ export default class SidebarsSidebar extends Component {
       topicCategory?.parentCategory?.id === this.docsModeCategoryID
     ) {
       this.activeState = "docs";
+    } else if (
+      currentRoute.includes("user") ||
+      currentRoute.includes("preferences")
+    ) {
+      this.activeState = "user";
     } else {
       this.activeState = "forum";
+      this.sidebarState.setPanel("main");
     }
   }
 
@@ -105,6 +99,11 @@ export default class SidebarsSidebar extends Component {
         // using the ID avoids looking up the category with asyncFindById
         DiscourseURL.routeTo(`/c/${this.docsModeCategoryID}`);
         break;
+      case "user":
+        DiscourseURL.routeTo(
+          `${userPath(this.currentUser.username.toLowerCase())}/summary`
+        );
+        break;
       default:
         DiscourseURL.routeTo(this.chatStateManager.lastKnownAppURL);
     }
@@ -115,32 +114,41 @@ export default class SidebarsSidebar extends Component {
       {{bodyClass "experimental-sidebars-sidebar"}}
       <div
         class="sidebars-sidebar__buttons"
-        {{didInsert this.forceSeparateMode}}
         {{didInsert this.setActive}}
         {{didUpdate this.setActive this.router.currentRoute}}
       >
         <DButton
           @icon="layer-group"
           @action={{fn this.switchState "forum"}}
-          @class={{if (eq this.activeState "forum") "active"}}
+          @class="btn-flat {{if (eq this.activeState 'forum') 'active'}}"
+          @translatedLabel={{i18n (themePrefix "sidebar_buttons.topics")}}
         />
         <DButton
           @icon="d-chat"
           @action={{fn this.switchState "chat"}}
-          @class={{if (eq this.activeState "chat") "active"}}
+          @class="btn-flat {{if (eq this.activeState 'chat') 'active'}}"
+          @translatedLabel={{i18n (themePrefix "sidebar_buttons.chat")}}
+        />
+        <DButton
+          @icon="user"
+          @action={{fn this.switchState "user"}}
+          @class="btn-flat {{if (eq this.activeState 'user') 'active'}}"
+          @translatedLabel={{i18n (themePrefix "sidebar_buttons.user")}}
         />
         {{#if this.docsModeCategory}}
           <DButton
             @icon="file-alt"
             @action={{fn this.switchState "docs"}}
-            @class={{if (eq this.activeState "docs") "active"}}
+            @class="btn-flat {{if (eq this.activeState 'docs') 'active'}}"
+            @translatedLabel={{i18n (themePrefix "sidebar_buttons.docs")}}
           />
         {{/if}}
         {{#if this.currentUser.admin}}
           <DButton
             @icon="wrench"
             @action={{fn this.switchState "admin"}}
-            @class={{if (eq this.activeState "admin") "active"}}
+            @class="btn-flat {{if (eq this.activeState 'admin') 'active'}}"
+            @translatedLabel={{i18n (themePrefix "sidebar_buttons.admin")}}
           />
         {{/if}}
       </div>
