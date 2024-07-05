@@ -42,7 +42,6 @@ export default class UserSidebarService extends Service {
   }
 
   showUserSidebar() {
-    console.log(this.router.currentRouteName);
     if (
       this.router.currentRouteName.includes("user") ||
       this.router.currentRouteName.includes("preferences")
