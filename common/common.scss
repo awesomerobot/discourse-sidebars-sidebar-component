@@ -39,10 +39,6 @@
     }
   }
 
-  .sidebar-section-link-wrapper .sidebar-section-link.active {
-    background: var(--d-hover);
-  }
-
   .sidebars-sidebar__buttons {
     order: -1;
     display: grid;
@@ -228,5 +224,105 @@
         }
       }
     }
+  }
+}
+
+.hamburger-panel .revamped {
+  .sidebar-section-wrapper {
+    margin-bottom: 0;
+  }
+  .panel-body-contents .sidebar-hamburger-dropdown {
+    display: grid;
+    grid-template-areas: "nav extra" "nav content";
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    padding-top: 0;
+
+    .user-sidebar-header {
+      order: 3;
+      padding-top: 0.75em;
+      margin-top: 0;
+      background: var(--secondary);
+      position: sticky;
+      top: 0;
+      border-left: 1px solid var(--primary-low);
+    }
+
+    .sidebar-sections {
+      grid-area: content;
+      padding: 0.75em;
+      border-left: 1px solid var(--primary-low);
+    }
+
+    .sidebars-sidebar__buttons {
+      grid-area: nav;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--secondary);
+      z-index: 2;
+      padding: 0.75em 0;
+      align-self: start;
+      border: none;
+      gap: 0;
+    }
+  }
+}
+
+.mobile-view {
+  --d-sidebar-highlight-background: var(--tertiary-low);
+
+  .sidebar-row {
+    --d-sidebar-row-horizontal-padding: 0.5em;
+  }
+  .menu-panel .sidebar-filter {
+    width: 100%;
+  }
+
+  .sidebar-panel-header__row {
+    margin: 0;
+  }
+
+  .horizontal-overflow-nav,
+  .user-main .about {
+    display: none;
+  }
+  .user-navigation,
+  .new-user-wrapper .user-navigation-secondary {
+    display: none;
+  }
+
+  .experimental-sidebars-sidebar .sidebars-sidebar__buttons .btn {
+    flex: 1 1 auto;
+    border-radius: 0;
+    padding: 0.85em 0.25em;
+    box-sizing: content-box;
+    .d-button-label {
+      color: var(--primary-high);
+      margin-top: 0.55em;
+    }
+    .d-icon {
+      color: var(--primary-medium);
+    }
+    &.active {
+      background: var(--tertiary-low);
+    }
+
+    &:hover {
+      // too specific in core, temp for now
+      background: transparent !important;
+      &.active {
+        background: var(--tertiary-low) !important;
+      }
+    }
+  }
+
+  .has-full-page-chat .d-header-icons .hamburger-dropdown {
+    display: block;
+  }
+
+  .header-dropdown-toggle.chat-header-icon {
+    display: none;
   }
 }
