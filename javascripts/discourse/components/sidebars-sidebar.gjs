@@ -21,6 +21,8 @@ export default class SidebarsSidebar extends Component {
   @service siteSettings;
   @service sidebarState;
   @service docsSidebar;
+  @service header;
+  @service site;
 
   @tracked activeState = null;
   @tracked docsModeCategory = settings.docs_mode_category;
@@ -36,8 +38,17 @@ export default class SidebarsSidebar extends Component {
     return this.currentUser && this.chatEnabled;
   }
 
+  get altFooterNav() {
+    return this.site.mobileView && settings.mobile_footer_nav;
+  }
+
   @action
   async setActive() {
+    // this is a dumb way to do this, untangle later
+    if (this.altFooterNav) {
+      return;
+    }
+
     this.docsModeCategory = await Category.asyncFindById(
       this.docsModeCategoryID
     );
@@ -70,6 +81,8 @@ export default class SidebarsSidebar extends Component {
       currentRoute.includes("preferences")
     ) {
       this.activeState = "user";
+    } else if (currentRoute.includes("search")) {
+      this.activeState = "search";
     } else {
       this.activeState = "forum";
       this.sidebarState.setPanel("main");
@@ -78,6 +91,47 @@ export default class SidebarsSidebar extends Component {
 
   @action
   switchState(mode) {
+    // this is a dumb way to do this, untangle later
+    if (this.altFooterNav) {
+      switch (mode) {
+        case "forum":
+          this.activeState = "forum";
+          this.sidebarState.setPanel("forum");
+          this.header.hamburgerVisible = true;
+
+          break;
+        case "admin":
+          this.header.hamburgerVisible = true;
+          this.activeState = "admin";
+
+          break;
+        case "chat":
+          this.activeState = "chat";
+          this.sidebarState.setPanel("chat");
+
+          this.header.hamburgerVisible = true;
+          break;
+        case "docs":
+          this.activeState = "docs";
+
+          this.header.hamburgerVisible = true;
+
+          break;
+        case "user":
+          this.activeState = "user";
+
+          this.header.hamburgerVisible = true;
+          break;
+        case "search":
+          this.header.hamburgerVisible = false;
+          DiscourseURL.routeTo("/search");
+          break;
+        default:
+          DiscourseURL.routeTo(this.chatStateManager.lastKnownAppURL);
+      }
+      return;
+    }
+
     switch (mode) {
       case "forum":
         DiscourseURL.routeTo("/");
@@ -103,6 +157,9 @@ export default class SidebarsSidebar extends Component {
         DiscourseURL.routeTo(
           `${userPath(this.currentUser.username.toLowerCase())}/summary`
         );
+        break;
+      case "search":
+        DiscourseURL.routeTo("/search");
         break;
       default:
         DiscourseURL.routeTo(this.chatStateManager.lastKnownAppURL);
@@ -149,6 +206,14 @@ export default class SidebarsSidebar extends Component {
             @action={{fn this.switchState "admin"}}
             @class="btn-flat {{if (eq this.activeState 'admin') 'active'}}"
             @translatedLabel={{i18n (themePrefix "sidebar_buttons.admin")}}
+          />
+        {{/if}}
+        {{#if @showSearch}}
+          <DButton
+            @icon="search"
+            @action={{fn this.switchState "search"}}
+            @class="btn-flat {{if (eq this.activeState 'search') 'active'}}"
+            @translatedLabel={{i18n (themePrefix "sidebar_buttons.search")}}
           />
         {{/if}}
       </div>

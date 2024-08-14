@@ -326,3 +326,28 @@
     display: none;
   }
 }
+
+// mobile nav
+
+.alt-mobile-nav {
+  position: fixed;
+  bottom: 0;
+  z-index: 90000;
+  background: var(--secondary);
+  left: 0;
+  right: 0;
+
+  .sidebars-sidebar__buttons {
+    border-top: 1px solid var(--primary-low);
+    box-shadow: var(--shadow-composer);
+    display: flex;
+    padding: 0;
+  }
+}
+
+.has-mobile-footer-nav {
+  .hamburger-panel .revamped .panel-body-contents .sidebar-hamburger-dropdown {
+    grid-template-areas: "extra" "content";
+    grid-template-columns: auto;
+  }
+}
