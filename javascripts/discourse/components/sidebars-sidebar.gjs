@@ -70,7 +70,16 @@ export default class SidebarsSidebar extends Component {
     const topicController = getOwner(this).lookup("controller:topic");
     const topic = topicController?.model;
 
+    if (!this.sidebarState) {
+      console.warn("SidebarState service not available");
+      return;
+    }
+
     this.sidebarState.mode = SEPARATED_MODE;
+
+    if (!this.sidebarState.currentPanel) {
+      this.sidebarState.setPanel("main");
+    }
 
     // Handle routes that don't need category lookups first
     if (currentRoute.includes("admin")) {
