@@ -1,6 +1,7 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { fn } from "@ember/helper";
+import { on } from "@ember/modifier";
 import { action } from "@ember/object";
 import { getOwner } from "@ember/owner";
 import didInsert from "@ember/render-modifiers/modifiers/did-insert";
@@ -8,6 +9,7 @@ import didUpdate from "@ember/render-modifiers/modifiers/did-update";
 import { service } from "@ember/service";
 import { eq } from "truth-helpers";
 import DButton from "discourse/components/d-button";
+import avatar from "discourse/helpers/bound-avatar-template";
 import bodyClass from "discourse/helpers/body-class";
 import { SEPARATED_MODE } from "discourse/lib/sidebar/panels";
 import DiscourseURL, { userPath } from "discourse/lib/url";
@@ -21,9 +23,13 @@ export default class SidebarsSidebar extends Component {
   @service siteSettings;
   @service sidebarState;
   @service docsSidebar;
+  @service groupsSidebar;
+  @service aboutSidebar;
+  @service store;
 
   @tracked activeState = null;
-  @tracked docsModeCategory = settings.docs_mode_category;
+  @tracked docsModeCategory = settings.docs_mode_category || null;
+  @tracked reviewableCount = 0;
 
   docsModeCategoryID = parseInt(this.docsModeCategory, 10);
   currentURL = this.router.currentURL;
@@ -32,48 +38,145 @@ export default class SidebarsSidebar extends Component {
     return this.siteSettings.chat_enabled;
   }
 
+  get aiEnabled() {
+    return this.siteSettings.ai_bot_enable_dedicated_ux;
+  }
+
+  get showReviewLink() {
+    return this.currentUser?.moderator;
+  }
+
   get shouldShow() {
-    return this.currentUser && this.chatEnabled;
+    return this.currentUser;
+  }
+
+  @action
+  async loadReviewableCount() {
+    if (this.showReviewLink) {
+      try {
+        const result = await this.store.findAll("reviewable");
+        this.reviewableCount = result?.content?.length || 0;
+      } catch (error) {
+        console.warn("Failed to load reviewable count:", error);
+        this.reviewableCount = 0;
+      }
+    }
   }
 
   @action
   async setActive() {
-    this.docsModeCategory = await Category.asyncFindById(
-      this.docsModeCategoryID
-    );
-
     this.currentURL = this.router.currentURL;
-
     const currentRoute = this.router.currentRouteName;
     const topicController = getOwner(this).lookup("controller:topic");
     const topic = topicController?.model;
-    const topicCategory = topic
-      ? await Category.asyncFindById(topic?.category_id)
-      : null;
 
     this.sidebarState.mode = SEPARATED_MODE;
 
+    // Handle routes that don't need category lookups first
     if (currentRoute.includes("admin")) {
       this.activeState = "admin";
-    } else if (currentRoute.includes("chat")) {
+      return;
+    }
+
+    if (currentRoute.includes("chat")) {
       this.activeState = "chat";
       this.sidebarState.setPanel("chat");
-    } else if (
-      this.currentURL.includes(this.docsModeCategory.url) ||
-      this.currentURL.includes(`/c/${this.docsModeCategoryID}`) ||
-      topic?.category_id === this.docsModeCategoryID ||
-      topicCategory?.parentCategory?.id === this.docsModeCategoryID
-    ) {
-      this.activeState = "docs";
-    } else if (
-      currentRoute.includes("user") ||
-      currentRoute.includes("preferences")
-    ) {
-      this.activeState = "user";
-    } else {
-      this.activeState = "forum";
-      this.sidebarState.setPanel("main");
+      return;
     }
+
+    if (currentRoute.includes("user") || currentRoute.includes("preferences")) {
+      // Don't set user active state for users directory
+      const isUsersDirectory =
+        this.currentURL === "/u" || this.currentURL?.startsWith("/u?");
+
+      if (!isUsersDirectory) {
+        // Only set active if viewing current user's profile
+        const topicController = getOwner(this).lookup("controller:topic");
+        const userController = getOwner(this).lookup("controller:user");
+        const viewingUser = userController?.model;
+
+        if (
+          viewingUser?.id === this.currentUser?.id ||
+          currentRoute.includes("preferences")
+        ) {
+          this.activeState = "user";
+        }
+      }
+      return;
+    }
+
+    if (currentRoute.includes("discourse-ai") || topic?.is_bot_pm) {
+      this.activeState = "ai";
+      this.sidebarState.setPanel("ai-conversations");
+      return;
+    }
+
+    if (currentRoute.includes("groups") || this.currentURL.includes("/g/")) {
+      this.activeState = "groups";
+      this.sidebarState.setPanel("discourse-sidebar-groups");
+      return;
+    }
+
+    if (this.currentURL.includes("/review")) {
+      this.activeState = "review";
+      return;
+    }
+
+    const isUsersDirectory =
+      this.currentURL === "/u" || this.currentURL?.startsWith("/u?");
+
+    if (
+      this.currentURL.includes("/about") ||
+      this.currentURL.includes("/faq") ||
+      this.currentURL.includes("/privacy") ||
+      this.currentURL.includes("/badges") ||
+      isUsersDirectory
+    ) {
+      this.activeState = "about";
+      this.sidebarState.setPanel("discourse-sidebar-about");
+      return;
+    }
+
+    // Handle docs mode detection with async category lookups
+    try {
+      const categoryPromises = [];
+
+      if (this.docsModeCategoryID) {
+        categoryPromises.push(Category.asyncFindById(this.docsModeCategoryID));
+      }
+
+      if (topic?.category_id) {
+        categoryPromises.push(Category.asyncFindById(topic.category_id));
+      }
+
+      const [docsModeCategory, topicCategory] = await Promise.all(
+        categoryPromises
+      );
+
+      if (docsModeCategory) {
+        this.docsModeCategory = docsModeCategory;
+      }
+
+      const isDocsMode =
+        (docsModeCategory && this.currentURL.includes(docsModeCategory.url)) ||
+        this.currentURL.includes(`/c/${this.docsModeCategoryID}`) ||
+        topic?.category_id === this.docsModeCategoryID ||
+        topicCategory?.parentCategory?.id === this.docsModeCategoryID;
+
+      if (isDocsMode) {
+        this.activeState = "docs";
+        return;
+      }
+    } catch (error) {
+      console.warn("Failed to load categories for docs mode detection:", error);
+    }
+
+    // Default to forum
+    this.activeState = "forum";
+    this.sidebarState.setPanel("main");
+
+    // Load reviewable count
+    this.loadReviewableCount();
   }
 
   @action
@@ -104,6 +207,18 @@ export default class SidebarsSidebar extends Component {
           `${userPath(this.currentUser.username.toLowerCase())}/summary`
         );
         break;
+      case "ai":
+        DiscourseURL.routeTo("/discourse-ai/ai-bot/conversations");
+        break;
+      case "groups":
+        DiscourseURL.routeTo("/g");
+        break;
+      case "about":
+        DiscourseURL.routeTo("/about");
+        break;
+      case "review":
+        DiscourseURL.routeTo("/review");
+        break;
       default:
         DiscourseURL.routeTo(this.chatStateManager.lastKnownAppURL);
     }
@@ -118,23 +233,35 @@ export default class SidebarsSidebar extends Component {
         {{didUpdate this.setActive this.router.currentRoute}}
       >
         <DButton
-          @icon="layer-group"
+          @icon="landmark"
           @action={{fn this.switchState "forum"}}
           @class="btn-flat {{if (eq this.activeState 'forum') 'active'}}"
           @translatedLabel={{i18n (themePrefix "sidebar_buttons.topics")}}
         />
+        {{#if this.chatEnabled}}
+          <DButton
+            @icon="d-chat"
+            @action={{fn this.switchState "chat"}}
+            @class="btn-flat {{if (eq this.activeState 'chat') 'active'}}"
+            @translatedLabel={{i18n (themePrefix "sidebar_buttons.chat")}}
+          />
+        {{/if}}
+
+        {{#if this.aiEnabled}}
+          <DButton
+            @icon="robot"
+            @action={{fn this.switchState "ai"}}
+            @class="btn-flat {{if (eq this.activeState 'ai') 'active'}}"
+            @translatedLabel={{i18n (themePrefix "sidebar_buttons.ai")}}
+          />
+        {{/if}}
         <DButton
-          @icon="d-chat"
-          @action={{fn this.switchState "chat"}}
-          @class="btn-flat {{if (eq this.activeState 'chat') 'active'}}"
-          @translatedLabel={{i18n (themePrefix "sidebar_buttons.chat")}}
+          @icon="users"
+          @action={{fn this.switchState "groups"}}
+          @class="btn-flat {{if (eq this.activeState 'groups') 'active'}}"
+          @translatedLabel={{i18n (themePrefix "sidebar_buttons.groups")}}
         />
-        <DButton
-          @icon="user"
-          @action={{fn this.switchState "user"}}
-          @class="btn-flat {{if (eq this.activeState 'user') 'active'}}"
-          @translatedLabel={{i18n (themePrefix "sidebar_buttons.user")}}
-        />
+
         {{#if this.docsModeCategory}}
           <DButton
             @icon="file-alt"
@@ -143,6 +270,30 @@ export default class SidebarsSidebar extends Component {
             @translatedLabel={{i18n (themePrefix "sidebar_buttons.docs")}}
           />
         {{/if}}
+
+        <DButton
+          @icon="circle-info"
+          @action={{fn this.switchState "about"}}
+          @class="btn-flat sidebar-about-button {{if
+            (eq this.activeState 'about')
+            'active'
+          }}"
+          @translatedLabel={{i18n (themePrefix "sidebar_buttons.about")}}
+        />
+
+        {{#if this.showReviewLink}}
+          <DButton
+            @icon="flag"
+            @action={{fn this.switchState "review"}}
+            @class="btn-flat {{if (eq this.activeState 'review') 'active'}}"
+            @translatedLabel={{i18n (themePrefix "sidebar_buttons.review")}}
+          >
+            {{#if this.reviewableCount}}
+              <span class="badge-notification">{{this.reviewableCount}}</span>
+            {{/if}}
+          </DButton>
+        {{/if}}
+
         {{#if this.currentUser.admin}}
           <DButton
             @icon="wrench"
@@ -151,6 +302,22 @@ export default class SidebarsSidebar extends Component {
             @translatedLabel={{i18n (themePrefix "sidebar_buttons.admin")}}
           />
         {{/if}}
+
+        {{#if this.currentUser}}
+          <button
+            type="button"
+            class="btn btn-flat sidebar-user-button
+              {{if (eq this.activeState 'user') 'active'}}"
+            {{on "click" (fn this.switchState "user")}}
+            title={{i18n (themePrefix "sidebar_buttons.user")}}
+          >
+            {{avatar this.currentUser.avatar_template "tiny"}}
+            <span class="d-button-label">{{i18n
+                (themePrefix "sidebar_buttons.user")
+              }}</span>
+          </button>
+        {{/if}}
+
       </div>
     {{/if}}
   </template>

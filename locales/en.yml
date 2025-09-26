@@ -2,8 +2,12 @@ en:
   theme_metadata:
     description: ""
   sidebar_buttons:
-    topics: "Topics"
+    topics: "Forum"
     chat: "Chat"
     user: "Profile"
+    groups: "Groups"
+    review: "Review"
+    about: "About"
     docs: "Docs"
     admin: "Admin"
+    ai: "AI Bot"

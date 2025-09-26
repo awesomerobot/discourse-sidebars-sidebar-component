@@ -1,6 +1,7 @@
 :root {
   --sidebars-sidebar-button-width: 3.25em;
   --d-sidebar-row-horizontal-padding: 1rem;
+  --d-sidebar-admin-background: transparent;
 }
 
 .header-sidebar-toggle button {
@@ -21,7 +22,6 @@
   [data-link-name="admin"] {
     display: none;
   }
-
   .sidebar-wrapper {
     --d-sidebar-highlight-background: var(--d-hover);
   }
@@ -41,8 +41,10 @@
 
   .sidebars-sidebar__buttons {
     order: -1;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 0.5em;
+    padding-bottom: 1em;
 
     @if $style-mode == "top" {
       padding: 1.5em var(--d-sidebar-row-horizontal-padding) 0.5em;
@@ -51,7 +53,7 @@
 
     @if $style-mode == "left" {
       align-content: start;
-      padding-top: 1.35em;
+      padding-top: 1.45em;
       padding-left: 0.75em;
       padding-right: 0.75em;
       border-right: 1px solid var(--primary-low);
@@ -59,12 +61,14 @@
 
     .btn {
       box-sizing: border-box;
-      padding: 0.6em 0.33em 0.4em;
+      padding: 0.6em 0.15em 0.4em;
       gap: 0;
       flex-direction: column;
       width: var(--sidebars-sidebar-button-width);
       min-width: 0;
       overflow: hidden;
+      position: relative;
+
       .discourse-no-touch & {
         &:not(.active):hover {
           background: var(--d-hover);
@@ -84,7 +88,7 @@
         margin: 0;
       }
       &.active {
-        background: var(--d-hover);
+        background: var(--d-selected);
         color: var(--d-sidebar-highlight-color);
         .d-button-label {
           color: var(--d-sidebar-highlight-color);
@@ -225,6 +229,13 @@
       }
     }
   }
+
+  .badge-notification {
+    position: absolute;
+    right: 0;
+    top: 0.15em;
+    background: var(--tertiary-medium);
+  }
 }
 
 .hamburger-panel .revamped {
@@ -298,6 +309,7 @@
     border-radius: 0;
     padding: 0.85em 0.25em;
     box-sizing: content-box;
+
     .d-button-label {
       color: var(--primary-high);
       margin-top: 0.55em;
@@ -325,4 +337,161 @@
   .header-dropdown-toggle.chat-header-icon {
     display: none;
   }
+}
+
+.groups-header-new,
+.groups-header-filters-type,
+.d-header .ai-bot-button {
+  display: none;
+}
+
+.about-sidebar-header,
+.groups-sidebar-header,
+.community-sidebar-header {
+  padding: var(--d-sidebar-row-horizontal-padding);
+  padding-bottom: 0;
+  display: flex;
+  margin-top: 0.5em;
+
+  &__actions {
+    width: 100%;
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+.container.group {
+  .user-primary-navigation {
+    .combo-box-header {
+      display: none;
+    }
+  }
+
+  .user-content {
+    margin-top: 1em;
+  }
+
+  .user-secondary-navigation {
+    border-bottom: 1px solid var(--primary-low);
+  }
+}
+
+.about-sidebar-header {
+  margin-top: 0.5em;
+}
+
+#current-user {
+  position: relative;
+
+  img {
+    visibility: hidden;
+  }
+  .svg-icon.d-icon {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    top: 0.3em;
+  }
+
+  .discourse-no-touch &:hover,
+  &:focus-visible {
+    .d-icon {
+      color: var(--header_primary-high);
+    }
+  }
+}
+
+.body-page .nav-pills {
+  display: none;
+}
+
+.sidebar-more-section-trigger.sidebar-section-link {
+  display: none;
+}
+
+.sidebar-user-button {
+  margin-top: auto;
+}
+
+[data-list-item-name="everything"],
+[data-list-item-name="my-posts"],
+[data-list-item-name="review"],
+[data-list-item-name="invite"],
+[data-list-item-name="upcoming-events"],
+[data-list-item-name="my-messages"] {
+  display: none;
+}
+
+#navigation-bar {
+  display: none;
+}
+
+.category-breadcrumb {
+  display: none;
+}
+
+.navigation-container {
+  .breadcrumb-filter-navigation {
+    width: auto;
+    margin-right: 1em;
+    flex: 1 1 auto;
+  }
+}
+
+.navigation-controls {
+  #create-topic,
+  .topic-drafts-menu-trigger {
+    display: none;
+  }
+}
+
+.community-sidebar-header__actions {
+  display: flex;
+  white-space: nowrap;
+  gap: 0.5em;
+
+  .topic-drafts-menu-trigger.btn-small {
+    flex: 1 1 0;
+  }
+}
+
+#main-outlet-wrapper:has(#main-outlet .reviewable) {
+  --d-sidebar-width: 4.8em;
+  --d-max-width: 1454px;
+
+  .sidebar-sections {
+    display: none;
+  }
+
+  .sidebar-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: " sidebar-content";
+  }
+
+  .sidebars-sidebar__buttons {
+    grid-row-start: 1;
+  }
+
+  .reviewable-container {
+    flex-direction: row-reverse;
+    gap: 1em;
+  }
+
+  .reviewable .reviewable-container .reviewable-list + .reviewable-filters {
+    margin-left: 0;
+  }
+
+  .reviewable-item:first-child {
+    margin-top: 0;
+  }
+}
+
+body.has-ai-conversations-sidebar .ai-new-question-button__wrapper {
+  margin-top: 1.5em;
+}
+
+.has-full-page-chat .c-navbar-container {
+  padding-top: 1.25em;
 }

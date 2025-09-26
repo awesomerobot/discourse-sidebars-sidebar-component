@@ -2,9 +2,9 @@ import { tracked } from "@glimmer/tracking";
 import Service, { service } from "@ember/service";
 import { MAIN_PANEL } from "discourse/lib/sidebar/panels";
 
-export const SIDEBAR_USER_PANEL = "discourse-sidebar-user";
+export const SIDEBAR_GROUPS_PANEL = "discourse-sidebar-groups";
 
-export default class UserSidebarService extends Service {
+export default class GroupsSidebarService extends Service {
   @service appEvents;
   @service router;
   @service sidebarState;
@@ -12,13 +12,13 @@ export default class UserSidebarService extends Service {
 
   @tracked sidebarSettings = null;
 
-  @tracked _activeTopicId;
+  @tracked _activeGroupId;
   @tracked _currentSectionsConfig = null;
   @tracked _loading = false;
 
   constructor() {
     super(...arguments);
-    this.appEvents.on("page:changed", this, this.showUserSidebar);
+    this.appEvents.on("page:changed", this, this.showGroupsSidebar);
   }
 
   get isEnabled() {
@@ -26,14 +26,14 @@ export default class UserSidebarService extends Service {
   }
 
   get isVisible() {
-    return this.sidebarState.isCurrentPanel(SIDEBAR_USER_PANEL);
+    return this.sidebarState.isCurrentPanel(SIDEBAR_GROUPS_PANEL);
   }
 
   get loading() {
     return false;
   }
 
-  hideUserSidebar() {
+  hideGroupsSidebar() {
     if (!this.isVisible) {
       return;
     }
@@ -41,24 +41,24 @@ export default class UserSidebarService extends Service {
     this.sidebarState.setPanel(MAIN_PANEL);
   }
 
-  showUserSidebar() {
+  showGroupsSidebar() {
     if (
-      this.router.currentRouteName.includes("user") ||
-      this.router.currentRouteName.includes("preferences")
+      this.router.currentRouteName?.includes("groups") ||
+      this.router.currentURL?.includes("/g/")
     ) {
-      this.sidebarState.setPanel(SIDEBAR_USER_PANEL);
+      this.sidebarState.setPanel(SIDEBAR_GROUPS_PANEL);
       this.sidebarState.setSeparatedMode();
       this.sidebarState.hideSwitchPanelButtons();
     } else {
-      this.hideUserSidebar();
+      this.hideGroupsSidebar();
     }
   }
 
   toggleSidebarPanel() {
     if (this.isVisible) {
-      this.hideUserSidebar();
+      this.hideGroupsSidebar();
     } else {
-      this.showUserSidebar();
+      this.showGroupsSidebar();
     }
   }
 }

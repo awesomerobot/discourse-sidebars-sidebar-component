@@ -16,9 +16,17 @@ export default class UserSidebarHeader extends Component {
   @service currentUser;
 
   get shouldShow() {
+    const currentURL = this.router.currentURL;
+    const currentRoute = this.router.currentRouteName;
+
+    // Don't show on users directory page (with or without query params)
+    if (currentURL === "/u" || currentURL?.startsWith("/u?")) {
+      return false;
+    }
+
     return (
-      this.router.currentRouteName.includes("user") ||
-      this.router.currentRouteName.includes("preferences")
+      currentRoute?.includes("user") ||
+      currentRoute?.includes("preferences")
     );
   }
 

@@ -178,7 +178,7 @@ export default {
             title = I18n.t("user.filters.all");
             name = "user-activity";
             prefixType = "icon";
-            prefixValue = "stream";
+            prefixValue = "list";
 
             get model() {
               return userController.model || currentUser;
@@ -217,7 +217,7 @@ export default {
             title = I18n.t("user.read_help");
             name = "user-read";
             prefixType = "icon";
-            prefixValue = "history";
+            prefixValue = "clock";
 
             get model() {
               return userController.model || currentUser;
@@ -230,7 +230,7 @@ export default {
             title = I18n.t("drafts.label");
             name = "user-drafts";
             prefixType = "icon";
-            prefixValue = "pencil-alt";
+            prefixValue = "pencil";
 
             get model() {
               return userController.model || currentUser;
@@ -392,7 +392,7 @@ export default {
             title = I18n.t("user_action_groups.11");
             name = "user-edits";
             prefixType = "icon";
-            prefixValue = "pencil-alt";
+            prefixValue = "pencil";
 
             get model() {
               return userController.model || currentUser;
@@ -487,7 +487,7 @@ export default {
             title = I18n.t("user.messages.new");
             name = "new-messages";
             prefixType = "icon";
-            prefixValue = "exclamation-circle";
+            prefixValue = "circle";
 
             get model() {
               return userController.model || currentUser;
@@ -500,7 +500,7 @@ export default {
             title = I18n.t("user.messages.unread");
             name = "unread-messages";
             prefixType = "icon";
-            prefixValue = "plus-circle";
+            prefixValue = "plus";
 
             get model() {
               return userController.model || currentUser;
@@ -513,7 +513,7 @@ export default {
             title = I18n.t("user.messages.archive");
             name = "archive-messages";
             prefixType = "icon";
-            prefixValue = "archive";
+            prefixValue = "folder";
 
             get model() {
               return userController.model || currentUser;
