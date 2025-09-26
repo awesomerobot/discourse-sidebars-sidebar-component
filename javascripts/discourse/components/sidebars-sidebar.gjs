@@ -80,7 +80,9 @@ export default class SidebarsSidebar extends Component {
 
     if (currentRoute.includes("chat")) {
       this.activeState = "chat";
-      this.sidebarState.setPanel("chat");
+      if (this.sidebarState) {
+        this.sidebarState.setPanel("chat");
+      }
       return;
     }
 
@@ -107,13 +109,17 @@ export default class SidebarsSidebar extends Component {
 
     if (currentRoute.includes("discourse-ai") || topic?.is_bot_pm) {
       this.activeState = "ai";
-      this.sidebarState.setPanel("ai-conversations");
+      if (this.sidebarState) {
+        this.sidebarState.setPanel("ai-conversations");
+      }
       return;
     }
 
     if (currentRoute.includes("groups") || this.currentURL.includes("/g/")) {
       this.activeState = "groups";
-      this.sidebarState.setPanel("discourse-sidebar-groups");
+      if (this.sidebarState) {
+        this.sidebarState.setPanel("discourse-sidebar-groups");
+      }
       return;
     }
 
@@ -133,7 +139,9 @@ export default class SidebarsSidebar extends Component {
       isUsersDirectory
     ) {
       this.activeState = "about";
-      this.sidebarState.setPanel("discourse-sidebar-about");
+      if (this.sidebarState) {
+        this.sidebarState.setPanel("discourse-sidebar-about");
+      }
       return;
     }
 
@@ -160,13 +168,16 @@ export default class SidebarsSidebar extends Component {
       const isDocsMode =
         (docsModeCategory && this.currentURL.includes(docsModeCategory.url)) ||
         this.currentURL.includes(`/c/${this.docsModeCategoryID}`) ||
-        (docsModeCategory && this.currentURL.includes(`/c/${docsModeCategory.slug}`)) ||
+        (docsModeCategory &&
+          this.currentURL.includes(`/c/${docsModeCategory.slug}`)) ||
         topic?.category_id === this.docsModeCategoryID ||
         topicCategory?.parentCategory?.id === this.docsModeCategoryID;
 
       if (isDocsMode) {
         this.activeState = "docs";
-        this.sidebarState.setPanel("discourse_sidebar_docs");
+        if (this.sidebarState) {
+          this.sidebarState.setPanel("discourse_sidebar_docs");
+        }
         return;
       }
     } catch (error) {
@@ -175,7 +186,9 @@ export default class SidebarsSidebar extends Component {
 
     // Default to forum
     this.activeState = "forum";
-    this.sidebarState.setPanel("main");
+    if (this.sidebarState) {
+      this.sidebarState.setPanel("main");
+    }
 
     // Load reviewable count
     this.loadReviewableCount();
