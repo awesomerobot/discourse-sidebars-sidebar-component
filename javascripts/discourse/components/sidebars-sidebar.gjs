@@ -43,7 +43,7 @@ export default class SidebarsSidebar extends Component {
   }
 
   get showReviewLink() {
-    return this.currentUser?.moderator;
+    return this.currentUser?.staff;
   }
 
   get shouldShow() {
