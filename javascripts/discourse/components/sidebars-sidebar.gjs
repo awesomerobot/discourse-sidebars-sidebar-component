@@ -160,11 +160,13 @@ export default class SidebarsSidebar extends Component {
       const isDocsMode =
         (docsModeCategory && this.currentURL.includes(docsModeCategory.url)) ||
         this.currentURL.includes(`/c/${this.docsModeCategoryID}`) ||
+        (docsModeCategory && this.currentURL.includes(`/c/${docsModeCategory.slug}`)) ||
         topic?.category_id === this.docsModeCategoryID ||
         topicCategory?.parentCategory?.id === this.docsModeCategoryID;
 
       if (isDocsMode) {
         this.activeState = "docs";
+        this.sidebarState.setPanel("discourse_sidebar_docs");
         return;
       }
     } catch (error) {
