@@ -11,4 +11,4 @@ style_mode:
     - "left"
 
 svg_icons:
-  default: "info-circle|landmark|fingerprint|fire|seedling"
+  default: "book|info-circle|landmark|fingerprint|fire|seedling"

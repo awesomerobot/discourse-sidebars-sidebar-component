@@ -264,7 +264,7 @@ export default class SidebarsSidebar extends Component {
 
         {{#if this.docsModeCategory}}
           <DButton
-            @icon="file-alt"
+            @icon="book"
             @action={{fn this.switchState "docs"}}
             @class="btn-flat {{if (eq this.activeState 'docs') 'active'}}"
             @translatedLabel={{i18n (themePrefix "sidebar_buttons.docs")}}
