@@ -118,6 +118,13 @@
 
     .sidebars-sidebar__buttons {
       grid-area: sidebars;
+
+      .badge-notification {
+        position: absolute;
+        right: 0;
+        top: 0.15em;
+        background: var(--tertiary-medium);
+      }
     }
 
     .sidebar-sections {
@@ -228,13 +235,6 @@
         }
       }
     }
-  }
-
-  .badge-notification {
-    position: absolute;
-    right: 0;
-    top: 0.15em;
-    background: var(--tertiary-medium);
   }
 }
 
