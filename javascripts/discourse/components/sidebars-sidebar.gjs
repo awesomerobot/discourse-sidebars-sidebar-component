@@ -22,7 +22,7 @@ export default class SidebarsSidebar extends Component {
   @service currentUser;
   @service siteSettings;
   @service sidebarState;
-  @service docsSidebar;
+  @service docCategorySidebar;
   @service groupsSidebar;
   @service aboutSidebar;
   @service store;
@@ -71,15 +71,10 @@ export default class SidebarsSidebar extends Component {
     const topic = topicController?.model;
 
     if (!this.sidebarState) {
-      console.warn("SidebarState service not available");
       return;
     }
 
     this.sidebarState.mode = SEPARATED_MODE;
-
-    if (!this.sidebarState.currentPanel) {
-      this.sidebarState.setPanel("main");
-    }
 
     // Handle routes that don't need category lookups first
     if (currentRoute.includes("admin")) {
@@ -184,8 +179,8 @@ export default class SidebarsSidebar extends Component {
 
       if (isDocsMode) {
         this.activeState = "docs";
-        if (this.sidebarState) {
-          this.sidebarState.setPanel("discourse_sidebar_docs");
+        if (this.sidebarState && this.docCategorySidebar) {
+          this.docCategorySidebar.showDocsSidebar();
         }
         return;
       }

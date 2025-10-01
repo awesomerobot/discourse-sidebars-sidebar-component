@@ -25,7 +25,7 @@ export default class AboutSidebarService extends Service {
   }
 
   get isVisible() {
-    return this.sidebarState.isCurrentPanel(SIDEBAR_ABOUT_PANEL);
+    return this.sidebarState?.currentPanel && this.sidebarState.isCurrentPanel(SIDEBAR_ABOUT_PANEL);
   }
 
   get loading() {

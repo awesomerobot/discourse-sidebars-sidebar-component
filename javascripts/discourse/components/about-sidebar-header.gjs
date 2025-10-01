@@ -10,7 +10,7 @@ export default class AboutSidebarHeader extends Component {
   @service sidebarState;
 
   get shouldShow() {
-    return this.sidebarState.isCurrentPanel(SIDEBAR_ABOUT_PANEL);
+    return this.sidebarState?.currentPanel && this.sidebarState.isCurrentPanel(SIDEBAR_ABOUT_PANEL);
   }
 
   @action

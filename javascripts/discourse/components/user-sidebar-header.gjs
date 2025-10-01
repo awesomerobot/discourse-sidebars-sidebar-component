@@ -7,7 +7,7 @@ import DButton from "discourse/components/d-button";
 import avatar from "discourse/helpers/bound-avatar-template";
 import routeAction from "discourse/helpers/route-action";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import dIcon from "discourse-common/helpers/d-icon";
+import icon from "discourse/helpers/d-icon";
 import i18n from "discourse-common/helpers/i18n";
 
 export default class UserSidebarHeader extends Component {
@@ -25,13 +25,16 @@ export default class UserSidebarHeader extends Component {
     }
 
     return (
-      currentRoute?.includes("user") ||
-      currentRoute?.includes("preferences")
+      currentRoute?.includes("user") || currentRoute?.includes("preferences")
     );
   }
 
   get user() {
     return getOwner(this).lookup("controller:user").model;
+  }
+
+  get isViewingOwnProfile() {
+    return this.user?.id === this.currentUser?.id;
   }
 
   @action
@@ -64,25 +67,35 @@ export default class UserSidebarHeader extends Component {
           </span>
         </div>
         <div class="user-sidebar-header__actions">
-          <DButton
-            @action={{fn (routeAction "composePrivateMessage") this.user}}
-            @icon="envelope"
-            @title="user.private_message"
-            class="btn-default compose-pm"
-          />
-          <DButton
-            @action={{this.startChatting}}
-            @title="chat.title_capitalized"
-            @icon="d-chat"
-            class="btn-default chat-direct-message-btn"
-          />
+          {{#if this.isViewingOwnProfile}}
+            <DButton
+              @action={{routeAction "logout"}}
+              @icon="right-from-bracket"
+              @label="user.log_out"
+              class="btn-default logout-btn"
+            />
+          {{else}}
+            <DButton
+              @action={{fn (routeAction "composePrivateMessage") this.user}}
+              @icon="envelope"
+              @title="user.private_message"
+              class="btn-default compose-pm"
+            />
+            <DButton
+              @action={{this.startChatting}}
+              @title="chat.title_capitalized"
+              @icon="d-chat"
+              class="btn-default chat-direct-message-btn"
+            />
+
+          {{/if}}
           {{#if this.currentUser.admin}}
             <a
               href={{this.user.adminPath}}
               title={{i18n "admin.user.show_admin_profile"}}
               class="btn btn-default no-text icon-only user-admin"
             >
-              {{dIcon "wrench"}}
+              {{icon "wrench"}}
             </a>
           {{/if}}
         </div>

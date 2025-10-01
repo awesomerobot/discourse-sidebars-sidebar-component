@@ -26,7 +26,7 @@ export default class UserSidebarService extends Service {
   }
 
   get isVisible() {
-    return this.sidebarState.isCurrentPanel(SIDEBAR_USER_PANEL);
+    return this.sidebarState?.currentPanel && this.sidebarState.isCurrentPanel(SIDEBAR_USER_PANEL);
   }
 
   get loading() {

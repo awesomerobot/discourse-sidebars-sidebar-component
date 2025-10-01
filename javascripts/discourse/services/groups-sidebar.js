@@ -26,7 +26,7 @@ export default class GroupsSidebarService extends Service {
   }
 
   get isVisible() {
-    return this.sidebarState.isCurrentPanel(SIDEBAR_GROUPS_PANEL);
+    return this.sidebarState?.currentPanel && this.sidebarState.isCurrentPanel(SIDEBAR_GROUPS_PANEL);
   }
 
   get loading() {
