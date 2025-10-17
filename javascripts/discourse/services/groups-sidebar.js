@@ -21,12 +21,20 @@ export default class GroupsSidebarService extends Service {
     this.appEvents.on("page:changed", this, this.showGroupsSidebar);
   }
 
+  willDestroy() {
+    super.willDestroy();
+    this.appEvents.off("page:changed", this, this.showGroupsSidebar);
+  }
+
   get isEnabled() {
     return true;
   }
 
   get isVisible() {
-    return this.sidebarState?.currentPanel && this.sidebarState.isCurrentPanel(SIDEBAR_GROUPS_PANEL);
+    return (
+      this.sidebarState?.currentPanel &&
+      this.sidebarState.isCurrentPanel(SIDEBAR_GROUPS_PANEL)
+    );
   }
 
   get loading() {

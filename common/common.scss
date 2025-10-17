@@ -423,12 +423,13 @@
   display: none;
 }
 
-#navigation-bar {
-  display: none;
-}
-
-.category-breadcrumb {
-  display: none;
+@if $replace_breadcrumb_with_filter == "true" {
+  .category-breadcrumb {
+    display: none;
+  }
+  #navigation-bar {
+    display: none;
+  }
 }
 
 .navigation-container {

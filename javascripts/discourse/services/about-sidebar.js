@@ -20,12 +20,20 @@ export default class AboutSidebarService extends Service {
     this.appEvents.on("page:changed", this, this.showAboutSidebar);
   }
 
+  willDestroy() {
+    super.willDestroy();
+    this.appEvents.off("page:changed", this, this.showAboutSidebar);
+  }
+
   get isEnabled() {
     return true;
   }
 
   get isVisible() {
-    return this.sidebarState?.currentPanel && this.sidebarState.isCurrentPanel(SIDEBAR_ABOUT_PANEL);
+    return (
+      this.sidebarState?.currentPanel &&
+      this.sidebarState.isCurrentPanel(SIDEBAR_ABOUT_PANEL)
+    );
   }
 
   get loading() {
@@ -42,7 +50,8 @@ export default class AboutSidebarService extends Service {
 
   showAboutSidebar() {
     const currentURL = this.router.currentURL;
-    const isUsersDirectory = currentURL === "/u" || currentURL?.startsWith("/u?");
+    const isUsersDirectory =
+      currentURL === "/u" || currentURL?.startsWith("/u?");
 
     if (
       currentURL?.includes("/about") ||

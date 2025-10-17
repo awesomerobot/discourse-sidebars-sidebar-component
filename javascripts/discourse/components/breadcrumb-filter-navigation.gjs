@@ -61,86 +61,105 @@ export default class BreadcrumbFilterNavigation extends Component {
         name: "category:",
         description: "Filter by category",
         type: "category",
-        priority: 1
+        priority: 1,
       },
       // Only add tag filter if tagging is enabled
-      ...(this.site.can_tag_topics ? [{
-        name: "tag:",
-        description: "Filter by tag",
-        type: "tag",
-        priority: 1
-      }] : []),
+      ...(this.site.can_tag_topics
+        ? [
+            {
+              name: "tag:",
+              description: "Filter by tag",
+              type: "tag",
+              priority: 1,
+            },
+          ]
+        : []),
       {
         name: "status:",
         description: "Filter by topic status",
         type: "text",
-        priority: 1
+        priority: 1,
       },
       {
         name: "created:",
         description: "Filter by creation date",
         type: "date",
-        priority: 1
+        priority: 1,
       },
       {
         name: "posts:",
         description: "Filter by post count",
         type: "number",
-        priority: 1
+        priority: 1,
       },
       {
         name: "likes:",
         description: "Filter by like count",
         type: "number",
-        priority: 1
+        priority: 1,
       },
       {
         name: "user:",
         description: "Filter by username",
         type: "username",
-        priority: 1
+        priority: 1,
       },
       {
         name: "before:",
         description: "Before date",
         type: "date",
-        priority: 2
+        priority: 2,
       },
       {
         name: "after:",
         description: "After date",
         type: "date",
-        priority: 2
+        priority: 2,
       },
       {
         name: "in:",
         description: "Search scope",
         type: "text",
-        priority: 2
-      }
+        priority: 2,
+      },
     ];
 
     // Add order filters - base filter plus all specific options
     tips.push({
       name: "order:",
       description: "Sort order",
-      priority: 1
+      priority: 1,
     });
 
     // Add specific order options
     const orderOptions = [
       { name: "order:activity", description: "Sort by activity" },
-      { name: "order:activity-asc", description: "Sort by activity (ascending)" },
+      {
+        name: "order:activity-asc",
+        description: "Sort by activity (ascending)",
+      },
       { name: "order:category", description: "Sort by category" },
-      { name: "order:category-asc", description: "Sort by category (ascending)" },
+      {
+        name: "order:category-asc",
+        description: "Sort by category (ascending)",
+      },
       { name: "order:created", description: "Sort by creation date" },
-      { name: "order:created-asc", description: "Sort by creation date (ascending)" },
+      {
+        name: "order:created-asc",
+        description: "Sort by creation date (ascending)",
+      },
       { name: "order:latest-post", description: "Sort by latest post" },
-      { name: "order:latest-post-asc", description: "Sort by latest post (ascending)" },
+      {
+        name: "order:latest-post-asc",
+        description: "Sort by latest post (ascending)",
+      },
       { name: "order:likes", description: "Sort by likes" },
       { name: "order:likes-asc", description: "Sort by likes (ascending)" },
       { name: "order:likes-op", description: "Sort by OP likes" },
-      { name: "order:likes-op-asc", description: "Sort by OP likes (ascending)" },
+      {
+        name: "order:likes-op-asc",
+        description: "Sort by OP likes (ascending)",
+      },
       { name: "order:posters", description: "Sort by posters" },
       { name: "order:posters-asc", description: "Sort by posters (ascending)" },
       { name: "order:title", description: "Sort by title" },
@@ -150,7 +169,10 @@ export default class BreadcrumbFilterNavigation extends Component {
       { name: "order:hot", description: "Sort by hot score" },
       { name: "order:hot-asc", description: "Sort by hot score (ascending)" },
       { name: "order:read", description: "Sort by read status" },
-      { name: "order:read-asc", description: "Sort by read status (ascending)" }
+      {
+        name: "order:read-asc",
+        description: "Sort by read status (ascending)",
+      },
     ];
 
     tips.push(...orderOptions);
@@ -160,8 +182,11 @@ export default class BreadcrumbFilterNavigation extends Component {
 
   get shouldShow() {
     const currentRoute = this.router.currentRouteName;
-    return (currentRoute?.startsWith("discovery.") || currentRoute?.startsWith("tag.")) &&
-           !currentRoute?.includes("categories");
+    return (
+      (currentRoute?.startsWith("discovery.") ||
+        currentRoute?.startsWith("tag.")) &&
+      !currentRoute?.includes("categories")
+    );
   }
 
   get showBulkSelectInNavControls() {
@@ -176,8 +201,8 @@ export default class BreadcrumbFilterNavigation extends Component {
 
   @action
   getCategoryAndTag() {
-    this.category = this.router.currentRoute.attributes?.category || null;
-    this.tag = this.router.currentRoute.attributes?.tag || null;
+    this.category = this.router.currentRoute?.attributes?.category || null;
+    this.tag = this.router.currentRoute?.attributes?.tag || null;
 
     // Build initial query string based on context
     let queryParts = [];

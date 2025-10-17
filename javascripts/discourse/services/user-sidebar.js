@@ -21,12 +21,20 @@ export default class UserSidebarService extends Service {
     this.appEvents.on("page:changed", this, this.showUserSidebar);
   }
 
+  willDestroy() {
+    super.willDestroy();
+    this.appEvents.off("page:changed", this, this.showUserSidebar);
+  }
+
   get isEnabled() {
     return true;
   }
 
   get isVisible() {
-    return this.sidebarState?.currentPanel && this.sidebarState.isCurrentPanel(SIDEBAR_USER_PANEL);
+    return (
+      this.sidebarState?.currentPanel &&
+      this.sidebarState.isCurrentPanel(SIDEBAR_USER_PANEL)
+    );
   }
 
   get loading() {
@@ -43,8 +51,8 @@ export default class UserSidebarService extends Service {
 
   showUserSidebar() {
     if (
-      this.router.currentRouteName.includes("user") ||
-      this.router.currentRouteName.includes("preferences")
+      this.router?.currentRouteName?.includes("user") ||
+      this.router?.currentRouteName?.includes("preferences")
     ) {
       this.sidebarState.setPanel(SIDEBAR_USER_PANEL);
       this.sidebarState.setSeparatedMode();

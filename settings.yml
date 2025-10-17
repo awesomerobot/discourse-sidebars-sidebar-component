@@ -10,5 +10,9 @@ style_mode:
     - "top"
     - "left"
 
+replace_breadcrumb_with_filter:
+  default: false
+  type: bool
+
 svg_icons:
   default: "book|info-circle|landmark|fingerprint|fire|seedling"
