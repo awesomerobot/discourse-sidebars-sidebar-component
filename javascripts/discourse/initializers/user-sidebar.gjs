@@ -77,52 +77,6 @@ export default {
         SIDEBAR_USER_PANEL
       );
 
-      // user invites
-      api.addSidebarSection(
-        (BaseCustomSidebarSection, BaseCustomSidebarSectionLink) => {
-          const UserInviteLink = class extends BaseCustomSidebarSectionLink {
-            route = "userInvited";
-            text = I18n.t("user.invited.title");
-            title = I18n.t("user.invited.title");
-            name = "user-invites";
-            prefixType = "icon";
-            prefixValue = "user-plus";
-
-            constructor() {
-              super(...arguments);
-            }
-
-            get model() {
-              return userController.model || currentUser;
-            }
-          };
-
-          const UserInviteSection = class extends BaseCustomSidebarSection {
-            hideSectionHeader = true;
-            name = "user-invites";
-
-            get displaySection() {
-              return currentUser.can_invite_to_forum;
-            }
-
-            get sectionLinks() {
-              return UserInviteLink;
-            }
-
-            get text() {
-              return null;
-            }
-
-            get links() {
-              return [new UserInviteLink()];
-            }
-          };
-
-          return UserInviteSection;
-        },
-        SIDEBAR_USER_PANEL
-      );
-
       // user badges
       api.addSidebarSection(
         (BaseCustomSidebarSection, BaseCustomSidebarSectionLink) => {
@@ -178,7 +132,7 @@ export default {
             title = I18n.t("user.filters.all");
             name = "user-activity";
             prefixType = "icon";
-            prefixValue = "list";
+            prefixValue = "bars-staggered";
 
             get model() {
               return userController.model || currentUser;
@@ -276,6 +230,19 @@ export default {
             }
           };
 
+          const UserInvitesLink = class extends BaseCustomSidebarSectionLink {
+            route = "userInvited";
+            text = I18n.t("user.invited.title");
+            title = I18n.t("user.invited.title");
+            name = "user-invites";
+            prefixType = "icon";
+            prefixValue = "user-plus";
+
+            get model() {
+              return userController.model || currentUser;
+            }
+          };
+
           const UserActivitySection = class extends BaseCustomSidebarSection {
             hideSectionHeader = false;
             name = "user-activity";
@@ -312,6 +279,10 @@ export default {
 
               if (userController.showBookmarks) {
                 links.push(new UserBookmarksLink());
+              }
+
+              if (currentUser.can_invite_to_forum) {
+                links.push(new UserInvitesLink());
               }
 
               return links;

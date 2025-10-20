@@ -86,6 +86,23 @@ export default {
             }
           };
 
+          const ActivityPubLink = class extends BaseCustomSidebarSectionLink {
+            text = "ActivityPub";
+            title = "ActivityPub";
+            name = "activitypub";
+            prefixType = "icon";
+            prefixValue = "share-nodes";
+
+            get href() {
+              return "/ap/about";
+            }
+
+            get currentWhen() {
+              const router = container.lookup("service:router");
+              return router.currentURL?.includes("/ap/about");
+            }
+          };
+
           const SiteInfoSection = class extends BaseCustomSidebarSection {
             hideSectionHeader = false;
             name = "site-info";
@@ -96,6 +113,10 @@ export default {
 
             get sectionLinks() {
               const links = [new AboutLink(), new FAQLink(), new PrivacyLink()];
+
+              if (siteSettings.activity_pub_enabled) {
+                links.push(new ActivityPubLink());
+              }
 
               return links;
             }
@@ -152,6 +173,57 @@ export default {
             }
           };
 
+          const AnniversariesLink = class extends BaseCustomSidebarSectionLink {
+            text = I18n.t("anniversaries.title");
+            title = I18n.t("anniversaries.title");
+            name = "anniversaries";
+            prefixType = "icon";
+            prefixValue = "cake-candles";
+
+            get href() {
+              return "/cakeday/anniversaries/today";
+            }
+
+            get currentWhen() {
+              const router = container.lookup("service:router");
+              return router.currentURL?.includes("/cakeday/anniversaries");
+            }
+          };
+
+          const BirthdaysLink = class extends BaseCustomSidebarSectionLink {
+            text = I18n.t("birthdays.title");
+            title = I18n.t("birthdays.title");
+            name = "birthdays";
+            prefixType = "icon";
+            prefixValue = "cake-candles";
+
+            get href() {
+              return "/cakeday/birthdays/today";
+            }
+
+            get currentWhen() {
+              const router = container.lookup("service:router");
+              return router.currentURL?.includes("/cakeday/birthdays");
+            }
+          };
+
+          const LeaderboardLink = class extends BaseCustomSidebarSectionLink {
+            text = I18n.t("gamification.leaderboard.title");
+            title = I18n.t("gamification.leaderboard.title");
+            name = "leaderboard";
+            prefixType = "icon";
+            prefixValue = "trophy";
+
+            get href() {
+              return "/leaderboard";
+            }
+
+            get currentWhen() {
+              const router = container.lookup("service:router");
+              return router.currentURL?.includes("/leaderboard");
+            }
+          };
+
           const CommunitySection = class extends BaseCustomSidebarSection {
             hideSectionHeader = false;
             name = "community";
@@ -163,11 +235,20 @@ export default {
             get sectionLinks() {
               const links = [];
 
+              if (siteSettings.discourse_gamification_enabled) {
+                links.push(new LeaderboardLink());
+              }
+
               if (siteSettings.enable_badges) {
                 links.push(new BadgesLink());
               }
 
               links.push(new UsersLink());
+
+              if (siteSettings.cakeday_enabled) {
+                links.push(new AnniversariesLink());
+                links.push(new BirthdaysLink());
+              }
 
               return links;
             }

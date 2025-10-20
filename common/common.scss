@@ -347,7 +347,9 @@
 
 .about-sidebar-header,
 .groups-sidebar-header,
-.community-sidebar-header {
+.community-sidebar-header,
+.chat-sidebar-header,
+.ai-new-question-button__wrapper {
   padding: var(--d-sidebar-row-horizontal-padding);
   padding-bottom: 0;
   display: flex;
@@ -358,6 +360,25 @@
     .btn {
       width: 100%;
     }
+  }
+}
+
+body.has-ai-conversations-sidebar
+  .sidebar-sections__back-to-forum
+  + .ai-new-question-button__wrapper {
+  margin-top: 0.5em;
+  padding-inline: 0;
+}
+
+.chat-new-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  &__item {
+    width: 100%;
+    text-align: left;
+    justify-content: flex-start;
   }
 }
 
@@ -390,7 +411,7 @@
   .svg-icon.d-icon {
     position: absolute;
     pointer-events: none;
-    z-index: 2;
+    z-index: 1;
     top: 0.3em;
   }
 
@@ -419,7 +440,8 @@
 [data-list-item-name="review"],
 [data-list-item-name="invite"],
 [data-list-item-name="upcoming-events"],
-[data-list-item-name="my-messages"] {
+[data-list-item-name="my-messages"],
+[data-list-item-name="ai-bot"] {
   display: none;
 }
 
@@ -495,4 +517,23 @@ body.has-ai-conversations-sidebar .ai-new-question-button__wrapper {
 
 .has-full-page-chat .c-navbar-container {
   padding-top: 1.25em;
+}
+
+.sidebar-wrapper .sidebar-sections__back-to-forum {
+  display: none;
+}
+
+.header-search--enabled .floating-search-input-wrapper,
+.search-header--visible .floating-search-input-wrapper {
+  justify-content: end;
+}
+
+body:not(.category, .tags-page) {
+  #navigation-bar {
+    display: none;
+  }
+
+  .navigation-controls {
+    margin-left: auto;
+  }
 }

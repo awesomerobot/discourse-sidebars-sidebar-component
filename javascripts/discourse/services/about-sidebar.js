@@ -1,78 +1,40 @@
-import { tracked } from "@glimmer/tracking";
-import Service, { service } from "@ember/service";
-import { MAIN_PANEL } from "discourse/lib/sidebar/panels";
+import BaseSidebarService from "./base-sidebar";
 
 export const SIDEBAR_ABOUT_PANEL = "discourse-sidebar-about";
 
-export default class AboutSidebarService extends Service {
-  @service appEvents;
-  @service router;
-  @service sidebarState;
-  @service store;
-
-  @tracked sidebarSettings = null;
-
-  @tracked _currentSectionsConfig = null;
-  @tracked _loading = false;
+export default class AboutSidebarService extends BaseSidebarService {
+  panelKey = SIDEBAR_ABOUT_PANEL;
+  eventHandlerName = "showAboutSidebar";
 
   constructor() {
     super(...arguments);
     this.appEvents.on("page:changed", this, this.showAboutSidebar);
   }
 
-  willDestroy() {
-    super.willDestroy();
-    this.appEvents.off("page:changed", this, this.showAboutSidebar);
-  }
-
-  get isEnabled() {
-    return true;
-  }
-
-  get isVisible() {
-    return (
-      this.sidebarState?.currentPanel &&
-      this.sidebarState.isCurrentPanel(SIDEBAR_ABOUT_PANEL)
-    );
-  }
-
-  get loading() {
-    return false;
-  }
-
-  hideAboutSidebar() {
-    if (!this.isVisible) {
-      return;
-    }
-
-    this.sidebarState.setPanel(MAIN_PANEL);
-  }
-
-  showAboutSidebar() {
+  shouldShow() {
     const currentURL = this.router.currentURL;
     const isUsersDirectory =
       currentURL === "/u" || currentURL?.startsWith("/u?");
 
-    if (
+    return (
       currentURL?.includes("/about") ||
       currentURL?.includes("/faq") ||
       currentURL?.includes("/privacy") ||
-      currentURL?.includes("/badges") ||
+      currentURL?.includes("/ap/about") ||
+      (currentURL?.includes("/badges") && !currentURL.includes("/u/")) ||
+      currentURL?.includes("/cakeday/anniversaries") ||
+      currentURL?.includes("/cakeday/birthdays") ||
+      currentURL?.includes("/leaderboard") ||
       isUsersDirectory
-    ) {
-      this.sidebarState.setPanel(SIDEBAR_ABOUT_PANEL);
-      this.sidebarState.setSeparatedMode();
-      this.sidebarState.hideSwitchPanelButtons();
-    } else {
-      this.hideAboutSidebar();
-    }
+    );
   }
 
-  toggleSidebarPanel() {
-    if (this.isVisible) {
-      this.hideAboutSidebar();
-    } else {
-      this.showAboutSidebar();
-    }
+  // Alias methods for backward compatibility
+  hideAboutSidebar() {
+    return this.hideSidebar();
+  }
+
+  showAboutSidebar() {
+    return this.showSidebar();
   }
 }

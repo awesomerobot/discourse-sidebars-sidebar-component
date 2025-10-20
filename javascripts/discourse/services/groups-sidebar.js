@@ -1,72 +1,32 @@
 import { tracked } from "@glimmer/tracking";
-import Service, { service } from "@ember/service";
-import { MAIN_PANEL } from "discourse/lib/sidebar/panels";
+import BaseSidebarService from "./base-sidebar";
 
 export const SIDEBAR_GROUPS_PANEL = "discourse-sidebar-groups";
 
-export default class GroupsSidebarService extends Service {
-  @service appEvents;
-  @service router;
-  @service sidebarState;
-  @service store;
-
-  @tracked sidebarSettings = null;
+export default class GroupsSidebarService extends BaseSidebarService {
+  panelKey = SIDEBAR_GROUPS_PANEL;
+  eventHandlerName = "showGroupsSidebar";
 
   @tracked _activeGroupId;
-  @tracked _currentSectionsConfig = null;
-  @tracked _loading = false;
 
   constructor() {
     super(...arguments);
     this.appEvents.on("page:changed", this, this.showGroupsSidebar);
   }
 
-  willDestroy() {
-    super.willDestroy();
-    this.appEvents.off("page:changed", this, this.showGroupsSidebar);
-  }
-
-  get isEnabled() {
-    return true;
-  }
-
-  get isVisible() {
+  shouldShow() {
     return (
-      this.sidebarState?.currentPanel &&
-      this.sidebarState.isCurrentPanel(SIDEBAR_GROUPS_PANEL)
+      this.router.currentRouteName?.includes("groups") ||
+      this.router.currentURL?.includes("/g/")
     );
   }
 
-  get loading() {
-    return false;
-  }
-
+  // Alias methods for backward compatibility
   hideGroupsSidebar() {
-    if (!this.isVisible) {
-      return;
-    }
-
-    this.sidebarState.setPanel(MAIN_PANEL);
+    return this.hideSidebar();
   }
 
   showGroupsSidebar() {
-    if (
-      this.router.currentRouteName?.includes("groups") ||
-      this.router.currentURL?.includes("/g/")
-    ) {
-      this.sidebarState.setPanel(SIDEBAR_GROUPS_PANEL);
-      this.sidebarState.setSeparatedMode();
-      this.sidebarState.hideSwitchPanelButtons();
-    } else {
-      this.hideGroupsSidebar();
-    }
-  }
-
-  toggleSidebarPanel() {
-    if (this.isVisible) {
-      this.hideGroupsSidebar();
-    } else {
-      this.showGroupsSidebar();
-    }
+    return this.showSidebar();
   }
 }

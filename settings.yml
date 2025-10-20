@@ -15,4 +15,4 @@ replace_breadcrumb_with_filter:
   type: bool
 
 svg_icons:
-  default: "book|info-circle|landmark|fingerprint|fire|seedling"
+  default: "book|info-circle|landmark|fingerprint|fire|seedling|robot|cake-candles|birthday-cake|trophy|share-nodes"

@@ -39,7 +39,7 @@ export default class SidebarsSidebar extends Component {
   }
 
   get aiEnabled() {
-    return this.siteSettings.ai_bot_enable_dedicated_ux;
+    return this.siteSettings.ai_bot_enabled;
   }
 
   get showReviewLink() {
@@ -97,7 +97,6 @@ export default class SidebarsSidebar extends Component {
 
       if (!isUsersDirectory) {
         // Only set active if viewing current user's profile
-        const topicController = getOwner(this).lookup("controller:topic");
         const userController = getOwner(this).lookup("controller:user");
         const viewingUser = userController?.model;
 
@@ -139,7 +138,11 @@ export default class SidebarsSidebar extends Component {
       this.currentURL.includes("/about") ||
       this.currentURL.includes("/faq") ||
       this.currentURL.includes("/privacy") ||
-      this.currentURL.includes("/badges") ||
+      this.currentURL.includes("/ap/about") ||
+      (this.currentURL.includes("/badges") && !this.currentURL.includes("/u/")) ||
+      this.currentURL.includes("/cakeday/anniversaries") ||
+      this.currentURL.includes("/cakeday/birthdays") ||
+      this.currentURL.includes("/leaderboard") ||
       isUsersDirectory
     ) {
       this.activeState = "about";
