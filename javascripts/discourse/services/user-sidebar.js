@@ -15,6 +15,16 @@ export default class UserSidebarService extends BaseSidebarService {
   }
 
   shouldShow() {
+    const currentURL = this.router.currentURL;
+
+    // Don't show on group inbox routes
+    if (
+      currentURL?.includes("/messages/group/") ||
+      currentURL?.match(/\/messages\/group-/)
+    ) {
+      return false;
+    }
+
     return (
       this.router?.currentRouteName?.includes("user") ||
       this.router?.currentRouteName?.includes("preferences")

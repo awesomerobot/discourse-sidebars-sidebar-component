@@ -25,6 +25,7 @@ export default class SidebarsSidebar extends Component {
   @service docCategorySidebar;
   @service groupsSidebar;
   @service aboutSidebar;
+  @service inboxesSidebar;
   @service store;
 
   @tracked activeState = null;
@@ -48,6 +49,10 @@ export default class SidebarsSidebar extends Component {
 
   get shouldShow() {
     return this.currentUser;
+  }
+
+  get hasGroupInboxes() {
+    return this.currentUser?.groupsWithMessages?.length > 0;
   }
 
   @action
@@ -96,6 +101,18 @@ export default class SidebarsSidebar extends Component {
         this.currentURL === "/u" || this.currentURL?.startsWith("/u?");
 
       if (!isUsersDirectory) {
+        // Check for group inboxes first
+        if (
+          this.currentURL.includes("/messages/group/") ||
+          this.currentURL.match(/\/messages\/group-/)
+        ) {
+          this.activeState = "inboxes";
+          if (this.sidebarState && this.inboxesSidebar) {
+            this.inboxesSidebar.showInboxesSidebar();
+          }
+          return;
+        }
+
         // Only set active if viewing current user's profile
         const userController = getOwner(this).lookup("controller:user");
         const viewingUser = userController?.model;
@@ -135,7 +152,7 @@ export default class SidebarsSidebar extends Component {
       this.currentURL === "/u" || this.currentURL?.startsWith("/u?");
 
     if (
-      this.currentURL.includes("/about") ||
+      (this.currentURL.includes("/about") && !this.currentURL.includes("/ap/about")) ||
       this.currentURL.includes("/faq") ||
       this.currentURL.includes("/privacy") ||
       this.currentURL.includes("/ap/about") ||
@@ -229,6 +246,14 @@ export default class SidebarsSidebar extends Component {
           `${userPath(this.currentUser.username.toLowerCase())}/summary`
         );
         break;
+      case "inboxes":
+        if (this.currentUser.groupsWithMessages?.length > 0) {
+          const firstGroup = this.currentUser.groupsWithMessages[0];
+          DiscourseURL.routeTo(
+            `/u/${this.currentUser.username}/messages/group/${firstGroup.name}`
+          );
+        }
+        break;
       case "ai":
         DiscourseURL.routeTo("/discourse-ai/ai-bot/conversations");
         break;
@@ -277,12 +302,6 @@ export default class SidebarsSidebar extends Component {
             @translatedLabel={{i18n (themePrefix "sidebar_buttons.ai")}}
           />
         {{/if}}
-        <DButton
-          @icon="users"
-          @action={{fn this.switchState "groups"}}
-          @class="btn-flat {{if (eq this.activeState 'groups') 'active'}}"
-          @translatedLabel={{i18n (themePrefix "sidebar_buttons.groups")}}
-        />
 
         {{#if this.docsModeCategory}}
           <DButton
@@ -292,6 +311,22 @@ export default class SidebarsSidebar extends Component {
             @translatedLabel={{i18n (themePrefix "sidebar_buttons.docs")}}
           />
         {{/if}}
+
+        {{#if this.hasGroupInboxes}}
+          <DButton
+            @icon="inbox"
+            @action={{fn this.switchState "inboxes"}}
+            @class="btn-flat {{if (eq this.activeState 'inboxes') 'active'}}"
+            @translatedLabel={{i18n (themePrefix "sidebar_buttons.inboxes")}}
+          />
+        {{/if}}
+
+        <DButton
+          @icon="users"
+          @action={{fn this.switchState "groups"}}
+          @class="btn-flat {{if (eq this.activeState 'groups') 'active'}}"
+          @translatedLabel={{i18n (themePrefix "sidebar_buttons.groups")}}
+        />
 
         <DButton
           @icon="circle-info"

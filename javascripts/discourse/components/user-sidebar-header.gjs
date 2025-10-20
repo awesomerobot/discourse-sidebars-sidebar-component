@@ -24,6 +24,14 @@ export default class UserSidebarHeader extends Component {
       return false;
     }
 
+    // Don't show on group inbox routes
+    if (
+      currentURL?.includes("/messages/group/") ||
+      currentURL?.match(/\/messages\/group-/)
+    ) {
+      return false;
+    }
+
     return (
       currentRoute?.includes("user") || currentRoute?.includes("preferences")
     );

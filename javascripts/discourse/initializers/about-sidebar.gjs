@@ -48,7 +48,10 @@ export default {
 
             get currentWhen() {
               const router = container.lookup("service:router");
-              return router.currentURL?.includes("/about");
+              return (
+                router.currentURL?.includes("/about") &&
+                !router.currentURL?.includes("/ap/about")
+              );
             }
           };
 

@@ -11,6 +11,7 @@ en:
     docs: "Docs"
     admin: "Admin"
     ai: "AI Bot"
+    inboxes: "Inboxes"
   chat_header:
     new_chat: "New Chat"
     new_direct_message: "New Direct Message"

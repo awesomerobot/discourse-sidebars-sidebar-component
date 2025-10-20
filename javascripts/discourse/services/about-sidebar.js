@@ -17,7 +17,7 @@ export default class AboutSidebarService extends BaseSidebarService {
       currentURL === "/u" || currentURL?.startsWith("/u?");
 
     return (
-      currentURL?.includes("/about") ||
+      (currentURL?.includes("/about") && !currentURL.includes("/ap/about")) ||
       currentURL?.includes("/faq") ||
       currentURL?.includes("/privacy") ||
       currentURL?.includes("/ap/about") ||
