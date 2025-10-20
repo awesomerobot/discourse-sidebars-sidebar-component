@@ -42,6 +42,12 @@ export default {
         api.addSidebarSection(
           (BaseCustomSidebarSection, BaseCustomSidebarSectionLink) => {
             const InboxLink = class extends BaseCustomSidebarSectionLink {
+              constructor() {
+                super(...arguments);
+                this.pmTopicTrackingState = pmTopicTrackingState;
+                this.currentUser = currentUser;
+              }
+
               name = `${group.name}-inbox`;
               prefixType = "icon";
               prefixValue = "inbox";
@@ -55,7 +61,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}`;
               }
 
               get suffixType() {
@@ -66,15 +72,15 @@ export default {
 
               get suffixValue() {
                 const count =
-                  pmTopicTrackingState.lookupCount("new", {
+                  this.pmTopicTrackingState.lookupCount("new", {
                     inboxFilter: "group",
                     groupName: group.name,
                   }) +
-                  pmTopicTrackingState.lookupCount("unread", {
+                  this.pmTopicTrackingState.lookupCount("unread", {
                     inboxFilter: "group",
                     groupName: group.name,
                   });
-                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
+                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -84,13 +90,13 @@ export default {
               }
 
               get badgeText() {
-                if (currentUser.sidebarShowCountOfNewItems) {
+                if (this.currentUser.sidebarShowCountOfNewItems) {
                   const count =
-                    pmTopicTrackingState.lookupCount("new", {
+                    this.pmTopicTrackingState.lookupCount("new", {
                       inboxFilter: "group",
                       groupName: group.name,
                     }) +
-                    pmTopicTrackingState.lookupCount("unread", {
+                    this.pmTopicTrackingState.lookupCount("unread", {
                       inboxFilter: "group",
                       groupName: group.name,
                     });
@@ -100,6 +106,12 @@ export default {
             };
 
             const NewLink = class extends BaseCustomSidebarSectionLink {
+              constructor() {
+                super(...arguments);
+                this.pmTopicTrackingState = pmTopicTrackingState;
+                this.currentUser = currentUser;
+              }
+
               name = `${group.name}-new`;
               prefixType = "icon";
               prefixValue = "discourse-sparkles";
@@ -113,7 +125,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}/new`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}/new`;
               }
 
               get suffixType() {
@@ -123,11 +135,11 @@ export default {
               }
 
               get suffixValue() {
-                const count = pmTopicTrackingState.lookupCount("new", {
+                const count = this.pmTopicTrackingState.lookupCount("new", {
                   inboxFilter: "group",
                   groupName: group.name,
                 });
-                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
+                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -137,8 +149,8 @@ export default {
               }
 
               get badgeText() {
-                if (currentUser.sidebarShowCountOfNewItems) {
-                  const count = pmTopicTrackingState.lookupCount("new", {
+                if (this.currentUser.sidebarShowCountOfNewItems) {
+                  const count = this.pmTopicTrackingState.lookupCount("new", {
                     inboxFilter: "group",
                     groupName: group.name,
                   });
@@ -148,6 +160,12 @@ export default {
             };
 
             const UnreadLink = class extends BaseCustomSidebarSectionLink {
+              constructor() {
+                super(...arguments);
+                this.pmTopicTrackingState = pmTopicTrackingState;
+                this.currentUser = currentUser;
+              }
+
               name = `${group.name}-unread`;
               prefixType = "icon";
               prefixValue = "envelope";
@@ -161,7 +179,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}/unread`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}/unread`;
               }
 
               get suffixType() {
@@ -171,11 +189,11 @@ export default {
               }
 
               get suffixValue() {
-                const count = pmTopicTrackingState.lookupCount("unread", {
+                const count = this.pmTopicTrackingState.lookupCount("unread", {
                   inboxFilter: "group",
                   groupName: group.name,
                 });
-                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
+                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -185,8 +203,8 @@ export default {
               }
 
               get badgeText() {
-                if (currentUser.sidebarShowCountOfNewItems) {
-                  const count = pmTopicTrackingState.lookupCount("unread", {
+                if (this.currentUser.sidebarShowCountOfNewItems) {
+                  const count = this.pmTopicTrackingState.lookupCount("unread", {
                     inboxFilter: "group",
                     groupName: group.name,
                   });
@@ -196,6 +214,11 @@ export default {
             };
 
             const ArchiveLink = class extends BaseCustomSidebarSectionLink {
+              constructor() {
+                super(...arguments);
+                this.currentUser = currentUser;
+              }
+
               name = `${group.name}-archive`;
               prefixType = "icon";
               prefixValue = "box-archive";
@@ -209,7 +232,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}/archive`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}/archive`;
               }
             };
 
