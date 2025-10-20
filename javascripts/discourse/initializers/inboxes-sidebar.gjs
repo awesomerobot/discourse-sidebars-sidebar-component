@@ -1,3 +1,4 @@
+import { service } from "@ember/service";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { i18n } from "discourse-i18n";
 import { SIDEBAR_INBOXES_PANEL } from "../services/inboxes-sidebar";
@@ -7,9 +8,6 @@ export default {
   initialize(container) {
     withPluginApi("1.34.0", (api) => {
       const currentUser = container.lookup("service:current-user");
-      const pmTopicTrackingState = container.lookup(
-        "service:pm-topic-tracking-state"
-      );
 
       // inboxes panel
       api.addSidebarPanel((BaseCustomSidebarPanel) => {
@@ -41,15 +39,9 @@ export default {
       currentUser.groupsWithMessages?.forEach((group) => {
         api.addSidebarSection(
           (BaseCustomSidebarSection, BaseCustomSidebarSectionLink) => {
-            // Helper function to look up counts
-            const lookupCount = ({ type, groupName }) => {
-              return pmTopicTrackingState.lookupCount(type, {
-                inboxFilter: "group",
-                groupName,
-              });
-            };
-
             const InboxLink = class extends BaseCustomSidebarSectionLink {
+              @service pmTopicTrackingState;
+              @service currentUser;
               name = `${group.name}-inbox`;
               prefixType = "icon";
               prefixValue = "inbox";
@@ -63,7 +55,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}`;
               }
 
               get suffixType() {
@@ -74,9 +66,15 @@ export default {
 
               get suffixValue() {
                 const count =
-                  lookupCount({ type: "new", groupName: group.name }) +
-                  lookupCount({ type: "unread", groupName: group.name });
-                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
+                  this.pmTopicTrackingState.lookupCount("new", {
+                    inboxFilter: "group",
+                    groupName: group.name,
+                  }) +
+                  this.pmTopicTrackingState.lookupCount("unread", {
+                    inboxFilter: "group",
+                    groupName: group.name,
+                  });
+                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -86,16 +84,25 @@ export default {
               }
 
               get badgeText() {
-                if (currentUser.sidebarShowCountOfNewItems) {
+                if (this.currentUser.sidebarShowCountOfNewItems) {
                   const count =
-                    lookupCount({ type: "new", groupName: group.name }) +
-                    lookupCount({ type: "unread", groupName: group.name });
+                    this.pmTopicTrackingState.lookupCount("new", {
+                      inboxFilter: "group",
+                      groupName: group.name,
+                    }) +
+                    this.pmTopicTrackingState.lookupCount("unread", {
+                      inboxFilter: "group",
+                      groupName: group.name,
+                    });
                   return count > 0 ? count : null;
                 }
               }
             };
 
             const NewLink = class extends BaseCustomSidebarSectionLink {
+              @service pmTopicTrackingState;
+              @service currentUser;
+
               name = `${group.name}-new`;
               prefixType = "icon";
               prefixValue = "discourse-sparkles";
@@ -109,7 +116,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}/new`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}/new`;
               }
 
               get suffixType() {
@@ -119,8 +126,11 @@ export default {
               }
 
               get suffixValue() {
-                const count = lookupCount({ type: "new", groupName: group.name });
-                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
+                const count = this.pmTopicTrackingState.lookupCount("new", {
+                  inboxFilter: "group",
+                  groupName: group.name,
+                });
+                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -130,14 +140,20 @@ export default {
               }
 
               get badgeText() {
-                if (currentUser.sidebarShowCountOfNewItems) {
-                  const count = lookupCount({ type: "new", groupName: group.name });
+                if (this.currentUser.sidebarShowCountOfNewItems) {
+                  const count = this.pmTopicTrackingState.lookupCount("new", {
+                    inboxFilter: "group",
+                    groupName: group.name,
+                  });
                   return count > 0 ? count : null;
                 }
               }
             };
 
             const UnreadLink = class extends BaseCustomSidebarSectionLink {
+              @service pmTopicTrackingState;
+              @service currentUser;
+
               name = `${group.name}-unread`;
               prefixType = "icon";
               prefixValue = "envelope";
@@ -151,7 +167,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}/unread`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}/unread`;
               }
 
               get suffixType() {
@@ -161,11 +177,11 @@ export default {
               }
 
               get suffixValue() {
-                const count = lookupCount({
-                  type: "unread",
+                const count = this.pmTopicTrackingState.lookupCount("unread", {
+                  inboxFilter: "group",
                   groupName: group.name,
                 });
-                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
+                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -175,9 +191,9 @@ export default {
               }
 
               get badgeText() {
-                if (currentUser.sidebarShowCountOfNewItems) {
-                  const count = lookupCount({
-                    type: "unread",
+                if (this.currentUser.sidebarShowCountOfNewItems) {
+                  const count = this.pmTopicTrackingState.lookupCount("unread", {
+                    inboxFilter: "group",
                     groupName: group.name,
                   });
                   return count > 0 ? count : null;
@@ -186,6 +202,8 @@ export default {
             };
 
             const ArchiveLink = class extends BaseCustomSidebarSectionLink {
+              @service currentUser;
+
               name = `${group.name}-archive`;
               prefixType = "icon";
               prefixValue = "box-archive";
@@ -199,7 +217,7 @@ export default {
               }
 
               get href() {
-                return `/u/${currentUser.username}/messages/group/${group.name}/archive`;
+                return `/u/${this.currentUser.username}/messages/group/${group.name}/archive`;
               }
             };
 
