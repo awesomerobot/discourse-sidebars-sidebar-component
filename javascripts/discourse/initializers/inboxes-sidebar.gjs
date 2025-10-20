@@ -1,4 +1,3 @@
-import { service } from "@ember/service";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { i18n } from "discourse-i18n";
 import { SIDEBAR_INBOXES_PANEL } from "../services/inboxes-sidebar";
@@ -8,6 +7,9 @@ export default {
   initialize(container) {
     withPluginApi("1.34.0", (api) => {
       const currentUser = container.lookup("service:current-user");
+      const pmTopicTrackingState = container.lookup(
+        "service:pm-topic-tracking-state"
+      );
 
       // inboxes panel
       api.addSidebarPanel((BaseCustomSidebarPanel) => {
@@ -40,8 +42,6 @@ export default {
         api.addSidebarSection(
           (BaseCustomSidebarSection, BaseCustomSidebarSectionLink) => {
             const InboxLink = class extends BaseCustomSidebarSectionLink {
-              @service pmTopicTrackingState;
-              @service currentUser;
               name = `${group.name}-inbox`;
               prefixType = "icon";
               prefixValue = "inbox";
@@ -55,7 +55,7 @@ export default {
               }
 
               get href() {
-                return `/u/${this.currentUser.username}/messages/group/${group.name}`;
+                return `/u/${currentUser.username}/messages/group/${group.name}`;
               }
 
               get suffixType() {
@@ -66,15 +66,15 @@ export default {
 
               get suffixValue() {
                 const count =
-                  this.pmTopicTrackingState.lookupCount("new", {
+                  pmTopicTrackingState.lookupCount("new", {
                     inboxFilter: "group",
                     groupName: group.name,
                   }) +
-                  this.pmTopicTrackingState.lookupCount("unread", {
+                  pmTopicTrackingState.lookupCount("unread", {
                     inboxFilter: "group",
                     groupName: group.name,
                   });
-                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
+                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -84,13 +84,13 @@ export default {
               }
 
               get badgeText() {
-                if (this.currentUser.sidebarShowCountOfNewItems) {
+                if (currentUser.sidebarShowCountOfNewItems) {
                   const count =
-                    this.pmTopicTrackingState.lookupCount("new", {
+                    pmTopicTrackingState.lookupCount("new", {
                       inboxFilter: "group",
                       groupName: group.name,
                     }) +
-                    this.pmTopicTrackingState.lookupCount("unread", {
+                    pmTopicTrackingState.lookupCount("unread", {
                       inboxFilter: "group",
                       groupName: group.name,
                     });
@@ -100,9 +100,6 @@ export default {
             };
 
             const NewLink = class extends BaseCustomSidebarSectionLink {
-              @service pmTopicTrackingState;
-              @service currentUser;
-
               name = `${group.name}-new`;
               prefixType = "icon";
               prefixValue = "discourse-sparkles";
@@ -116,7 +113,7 @@ export default {
               }
 
               get href() {
-                return `/u/${this.currentUser.username}/messages/group/${group.name}/new`;
+                return `/u/${currentUser.username}/messages/group/${group.name}/new`;
               }
 
               get suffixType() {
@@ -126,11 +123,11 @@ export default {
               }
 
               get suffixValue() {
-                const count = this.pmTopicTrackingState.lookupCount("new", {
+                const count = pmTopicTrackingState.lookupCount("new", {
                   inboxFilter: "group",
                   groupName: group.name,
                 });
-                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
+                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -140,8 +137,8 @@ export default {
               }
 
               get badgeText() {
-                if (this.currentUser.sidebarShowCountOfNewItems) {
-                  const count = this.pmTopicTrackingState.lookupCount("new", {
+                if (currentUser.sidebarShowCountOfNewItems) {
+                  const count = pmTopicTrackingState.lookupCount("new", {
                     inboxFilter: "group",
                     groupName: group.name,
                   });
@@ -151,9 +148,6 @@ export default {
             };
 
             const UnreadLink = class extends BaseCustomSidebarSectionLink {
-              @service pmTopicTrackingState;
-              @service currentUser;
-
               name = `${group.name}-unread`;
               prefixType = "icon";
               prefixValue = "envelope";
@@ -167,7 +161,7 @@ export default {
               }
 
               get href() {
-                return `/u/${this.currentUser.username}/messages/group/${group.name}/unread`;
+                return `/u/${currentUser.username}/messages/group/${group.name}/unread`;
               }
 
               get suffixType() {
@@ -177,11 +171,11 @@ export default {
               }
 
               get suffixValue() {
-                const count = this.pmTopicTrackingState.lookupCount("unread", {
+                const count = pmTopicTrackingState.lookupCount("unread", {
                   inboxFilter: "group",
                   groupName: group.name,
                 });
-                if (!this.currentUser.sidebarShowCountOfNewItems && count > 0) {
+                if (!currentUser.sidebarShowCountOfNewItems && count > 0) {
                   return "circle";
                 }
               }
@@ -191,8 +185,8 @@ export default {
               }
 
               get badgeText() {
-                if (this.currentUser.sidebarShowCountOfNewItems) {
-                  const count = this.pmTopicTrackingState.lookupCount("unread", {
+                if (currentUser.sidebarShowCountOfNewItems) {
+                  const count = pmTopicTrackingState.lookupCount("unread", {
                     inboxFilter: "group",
                     groupName: group.name,
                   });
@@ -202,8 +196,6 @@ export default {
             };
 
             const ArchiveLink = class extends BaseCustomSidebarSectionLink {
-              @service currentUser;
-
               name = `${group.name}-archive`;
               prefixType = "icon";
               prefixValue = "box-archive";
@@ -217,7 +209,7 @@ export default {
               }
 
               get href() {
-                return `/u/${this.currentUser.username}/messages/group/${group.name}/archive`;
+                return `/u/${currentUser.username}/messages/group/${group.name}/archive`;
               }
             };
 
