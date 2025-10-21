@@ -309,6 +309,9 @@
     border-radius: 0;
     padding: 0.85em 0.25em;
     box-sizing: content-box;
+    @media screen and (max-width: 700px) {
+      padding: 0.75em 0;
+    }
 
     .d-button-label {
       color: var(--primary-high);
@@ -408,7 +411,8 @@ body.has-ai-conversations-sidebar
   img {
     visibility: hidden;
   }
-  .svg-icon.d-icon {
+
+  > .svg-icon.d-icon {
     position: absolute;
     pointer-events: none;
     z-index: 1;
@@ -417,7 +421,7 @@ body.has-ai-conversations-sidebar
 
   .discourse-no-touch &:hover,
   &:focus-visible {
-    .d-icon {
+    > .d-icon {
       color: var(--header_primary-high);
     }
   }
@@ -515,7 +519,8 @@ body.has-ai-conversations-sidebar .ai-new-question-button__wrapper {
   margin-top: 1.5em;
 }
 
-.sidebar-wrapper .sidebar-sections__back-to-forum {
+.sidebar-wrapper .sidebar-sections__back-to-forum,
+body.has-ai-conversations-sidebar .sidebar-sections__back-to-forum {
   display: none;
 }
 
@@ -531,5 +536,41 @@ body:not(.category, .tags-page) {
 
   .navigation-controls {
     margin-left: auto;
+  }
+}
+
+// smaller screen adjusments
+
+.hamburger-panel .revamped .panel-body-contents .sidebar-hamburger-dropdown {
+  flex: 1 1 100%;
+
+  .sidebar-sections {
+    min-width: 0; // shrink to fit mobile
+    border-left: 0;
+  }
+  .sidebars-sidebar__buttons {
+    height: 96dvh;
+    box-sizing: border-box;
+    border-right: 1px solid var(--primary-low);
+  }
+  .ai-new-question-button__wrapper {
+    padding-inline: 1em;
+  }
+}
+
+.desktop-view .hamburger-panel .ai-new-question-button {
+  display: flex;
+}
+
+@media (min-width: 40rem) {
+  .hamburger-panel
+    .revamped
+    .sidebar-section-wrapper.sidebar-section
+    .sidebar-section-content {
+    grid-template-columns: 1fr;
+  }
+
+  .hamburger-panel .revamped {
+    --d-sidebar-row-height: inherit;
   }
 }

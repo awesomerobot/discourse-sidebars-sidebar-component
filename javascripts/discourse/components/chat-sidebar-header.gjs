@@ -71,6 +71,7 @@ export default class ChatSidebarHeader extends Component {
               @icon="plus"
               @onRegisterApi={{this.onRegisterApi}}
               class="btn-default new-chat-btn"
+              @modalForMobile={{true}}
             >
               <:content>
                 <ul class="chat-new-menu">
